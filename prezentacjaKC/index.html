@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prezentacja awansowa – Katarzyna Cichoń-Nowak</title>
+<style>
+  :root { --bg:#111; --fg:#fff; --accent:#86a6ff; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; overflow:hidden; }
+  #app { height:100%; display:grid; place-items:center; }
+  #stageWrap { position:relative; width:min(100vw, 177.7778vh); height:min(56.25vw, 100vh); background:#000; box-shadow:0 0 40px rgba(0,0,0,.5); }
+  .slide { position:absolute; inset:0; display:none; background:#000; }
+  .slide.active { display:block; }
+  .slide img.bg { width:100%; height:100%; object-fit:contain; display:block; user-select:none; pointer-events:none; }
+  .hotspot { position:absolute; z-index:5; }
+  .quiz-link { position:absolute; z-index:8; display:block; border-radius:12px; text-decoration:none; }
+  .quiz-link:focus { outline:4px solid rgba(255,255,255,.9); outline-offset:3px; }
+  video.hotspot { object-fit:cover; background:#000; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,.25); }
+  audio.hotspot { width:280px; max-width:18%; transform:translateX(-70%); }
+  #hud { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); display:flex; gap:10px; align-items:center; padding:8px 12px; background:rgba(0,0,0,.62); border:1px solid rgba(255,255,255,.16); border-radius:999px; backdrop-filter:blur(8px); opacity:.25; transition:.2s; z-index:20; }
+  #hud:hover { opacity:1; }
+  button { appearance:none; border:0; color:#fff; background:rgba(255,255,255,.16); padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:600; }
+  button:hover { background:rgba(255,255,255,.28); }
+  #counter { min-width:72px; text-align:center; font-size:14px; opacity:.9; }
+  #hint { position:fixed; top:14px; left:50%; transform:translateX(-50%); padding:8px 12px; background:rgba(0,0,0,.55); border-radius:999px; font-size:13px; opacity:.8; z-index:30; }
+  .fade { animation:fade .15s ease-out; }
+  @keyframes fade { from { opacity:.3 } to { opacity:1 } }
+  @media print { #hud,#hint { display:none; } body { overflow:visible; } #app { display:block; } #stageWrap{width:100vw;height:auto;box-shadow:none;} .slide{position:relative;display:block;page-break-after:always;} }
+</style>
+</head>
+<body>
+<div id="hint">Sterowanie: ← → / spacja. Pełny ekran: F albo F11.</div>
+<div id="app"><div id="stageWrap"></div></div>
+<div id="hud"><button id="prev">←</button><div id="counter"></div><button id="next">→</button><button id="fs">Pełny ekran</button></div>
+<script>
+const TOTAL = 34;
+const stage = document.getElementById('stageWrap');
+let current = 1;
+
+function slideImg(n){ return `slides/slide${String(n).padStart(2,'0')}.jpg`; }
+
+for (let i=1;i<=TOTAL;i++) {
+  const s = document.createElement('section');
+  s.className = 'slide';
+  s.dataset.num = i;
+  const img = document.createElement('img');
+  img.className = 'bg';
+  img.src = slideImg(i);
+  img.alt = `Slajd ${i}`;
+  s.appendChild(img);
+
+  if (i === 18) {
+    const v1 = document.createElement('video');
+    v1.className = 'hotspot';
+    v1.src = 'media/media1.mp4';
+    v1.controls = true;
+    v1.playsInline = true;
+    v1.style.left = '-0.36%'; v1.style.top = '0%'; v1.style.width = '34.17%'; v1.style.height = '95.37%';
+    s.appendChild(v1);
+
+    const v2 = document.createElement('video');
+    v2.className = 'hotspot';
+    v2.src = 'media/media2.mp4';
+    v2.controls = true;
+    v2.playsInline = true;
+    v2.style.left = '69.27%'; v2.style.top = '1.63%'; v2.style.width = '32.60%'; v2.style.height = '93.93%';
+    s.appendChild(v2);
+  }
+
+  if (i === 29) {
+    const q = document.createElement('a');
+    q.className = 'quiz-link';
+    q.href = 'https://wordwall.net/resource/89147848/niebieski-balonik-antka';
+    q.target = '_blank';
+    q.rel = 'noopener noreferrer';
+    q.title = 'Otwórz quiz Wordwall';
+    q.setAttribute('aria-label', 'Otwórz quiz Wordwall');
+    q.style.left = '18.33%'; q.style.top = '67.59%'; q.style.width = '9.38%'; q.style.height = '5.37%';
+    s.appendChild(q);
+  }
+  if (i === 21) {
+    const a = document.createElement('audio');
+    a.className = 'hotspot';
+    a.src = 'media/media3.mp3';
+    a.controls = true;
+    a.style.left = '94%'; a.style.top = '21%';
+    s.appendChild(a);
+  }
+  stage.appendChild(s);
+}
+
+function pauseMedia() {
+  document.querySelectorAll('video,audio').forEach(m => { try { m.pause(); } catch(e){} });
+}
+function show(n) {
+  if (n < 1) n = 1;
+  if (n > TOTAL) n = TOTAL;
+  if (n !== current) pauseMedia();
+  current = n;
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active','fade'));
+  const active = document.querySelector(`.slide[data-num="${current}"]`);
+  active.classList.add('active','fade');
+  document.getElementById('counter').textContent = `${current} / ${TOTAL}`;
+  location.hash = `slajd-${current}`;
+}
+function next(){ show(current+1); }
+function prev(){ show(current-1); }
+function fullScreen(){ const el=document.documentElement; if(!document.fullscreenElement) el.requestFullscreen?.(); else document.exitFullscreen?.(); }
+
+document.getElementById('next').onclick = next;
+document.getElementById('prev').onclick = prev;
+document.getElementById('fs').onclick = fullScreen;
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+  if (e.key.toLowerCase() === 'f') fullScreen();
+  if (e.key === 'Home') show(1);
+  if (e.key === 'End') show(TOTAL);
+});
+const m = location.hash.match(/slajd-(\d+)/);
+show(m ? parseInt(m[1],10) : 1);
+setTimeout(()=>{ const h=document.getElementById('hint'); if(h) h.style.display='none'; }, 7000);
+</script>
+</body>
+</html>
