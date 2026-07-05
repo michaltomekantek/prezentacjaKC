@@ -1,0 +1,10 @@
+PREZENTACJA HTML - INSTRUKCJA
+
+1. Otwórz plik index.html w Chrome albo Edge.
+2. Naciśnij F11 albo przycisk „Pełny ekran”.
+3. Przechodzenie slajdów: strzałki lewo/prawo albo spacja.
+4. Na slajdzie 18 są dwa filmy z kontrolkami.
+5. Na slajdzie 21 jest dźwięk z kontrolką.
+6. Wgrać na serwer można cały folder web: index.html + foldery slides i media.
+
+Uwaga: to wersja odporna na brak PowerPointa. Slajdy są zapisane jako obrazy, więc układ się nie rozsypuje między komputerami.
